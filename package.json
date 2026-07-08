@@ -1,0 +1,56 @@
+{
+  "name": "cerveaubleu-drc-esm-orders-app",
+  "version": "1.0.0",
+  "description": "DRC EMR custom orders app: Radiology & Imaging / Procedures / Medical Supply home dashboards (lab-style fulfillment), patient chart Radiology tab, order basket panels and order workspaces.",
+  "browser": "dist/cerveaubleu-drc-esm-orders-app.js",
+  "main": "src/index.ts",
+  "source": true,
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cerveaubleu64/cerveaubleu-drc-esm-orders-app.git"
+  },
+  "scripts": {
+    "start": "openmrs develop",
+    "serve": "rspack serve --mode=development",
+    "build": "rspack --mode production",
+    "typescript": "tsc",
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' --config ./tools/i18next-parser.config.js"
+  },
+  "browserslist": [
+    "extends browserslist-config-openmrs"
+  ],
+  "dependencies": {
+    "@carbon/react": "^1.83.0",
+    "classnames": "^2.3.2",
+    "lodash-es": "^4.17.15"
+  },
+  "peerDependencies": {
+    "@openmrs/esm-framework": "9.x",
+    "@openmrs/esm-patient-common-lib": "12.x",
+    "react": "18.x",
+    "react-i18next": "16.x",
+    "react-router-dom": "6.x",
+    "swr": "2.x"
+  },
+  "devDependencies": {
+    "@openmrs/esm-framework": "9.0.3-pre.4092",
+    "@rspack/cli": "1.3.15",
+    "@rspack/core": "1.3.15",
+    "@types/lodash-es": "^4.17.3",
+    "@types/react": "^18.3.21",
+    "@types/react-dom": "^18.3.0",
+    "@types/webpack-env": "^1.18.8",
+    "browserslist-config-openmrs": "^1.0.1",
+    "i18next": "^25.0.0",
+    "i18next-parser": "^9.3.0",
+    "openmrs": "9.0.3-pre.4092",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^16.0.0",
+    "react-router-dom": "^6.3.0",
+    "swr": "2.2.5",
+    "typescript": "^5.0.0"
+  },
+  "packageManager": "yarn@4.10.3"
+}

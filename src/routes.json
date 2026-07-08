@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": ">=2.24.0"
+  },
+  "extensions": [
+    {
+      "name": "imaging-order-panel",
+      "slot": "order-basket-slot",
+      "component": "imagingOrderPanel",
+      "order": 3
+    },
+    {
+      "name": "procedures-order-panel",
+      "slot": "order-basket-slot",
+      "component": "procedureOrderPanel",
+      "order": 4
+    },
+    {
+      "name": "medical-supply-order-panel",
+      "slot": "order-basket-slot",
+      "component": "medicalSupplyOrderPanel",
+      "order": 5
+    },
+    {
+      "name": "radiology-and-imaging-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "component": "radiologyDashboardLink",
+      "meta": {
+        "name": "radiology-and-imaging",
+        "slot": "radiology-and-imaging-dashboard-slot",
+        "title": "Radiology and Imaging"
+      },
+      "online": true,
+      "offline": true,
+      "order": 20
+    },
+    {
+      "name": "procedures-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "component": "proceduresDashboardLink",
+      "meta": {
+        "name": "procedures",
+        "slot": "procedures-dashboard-slot",
+        "title": "Procedures"
+      },
+      "online": true,
+      "offline": true,
+      "order": 21
+    },
+    {
+      "name": "radiology-imaging-patient-dashboard-link",
+      "slot": "patient-chart-dashboard-slot",
+      "component": "radiologyImagingPatientDashboardLink",
+      "meta": {
+        "slot": "patient-chart-radiology-imaging-slot",
+        "path": "radiology-imaging",
+        "title": "Radiologie et Imagérie"
+      },
+      "order": 4.5
+    },
+    {
+      "name": "radiology-imaging-patient-dashboard",
+      "slot": "patient-chart-radiology-imaging-slot",
+      "component": "imagingPatientDashboard"
+    },
+    {
+      "name": "radiology-and-imaging-dashboard-root",
+      "slot": "radiology-and-imaging-dashboard-slot",
+      "component": "radiologyDashboardRoot"
+    },
+    {
+      "name": "procedures-dashboard-root",
+      "slot": "procedures-dashboard-slot",
+      "component": "proceduresDashboardRoot"
+    },
+    {
+      "name": "path-drc-pick-confirm-modal",
+      "component": "pickConfirmModal"
+    },
+    {
+      "name": "path-drc-reject-with-reason-modal",
+      "component": "rejectWithReasonModal"
+    },
+    {
+      "name": "path-drc-print-report-modal",
+      "component": "printReportModal"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "add-imaging-order",
+      "component": "addImagingOrderWorkspace",
+      "window": "patient-chart-order-basket"
+    },
+    {
+      "name": "add-procedure-order",
+      "component": "addProcedureOrderWorkspace",
+      "window": "patient-chart-order-basket"
+    },
+    {
+      "name": "add-medical-supply-order",
+      "component": "addMedicalSupplyOrderWorkspace",
+      "window": "patient-chart-order-basket"
+    },
+    {
+      "name": "path-drc-enter-results",
+      "component": "enterResultsWorkspace",
+      "window": "path-drc-enter-results-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "path-drc-enter-results-window",
+      "group": "path-drc-orders-group"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "path-drc-orders-group",
+      "scopePattern": "/home/(radiology-and-imaging|procedures)"
+    }
+  ]
+}
