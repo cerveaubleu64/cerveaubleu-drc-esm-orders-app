@@ -65,6 +65,22 @@
       "component": "imagingPatientDashboard"
     },
     {
+      "name": "procedures-patient-dashboard-link",
+      "slot": "patient-chart-dashboard-slot",
+      "component": "proceduresPatientDashboardLink",
+      "meta": {
+        "slot": "patient-chart-procedures-slot",
+        "path": "procedures",
+        "title": "Procédures"
+      },
+      "order": 4.6
+    },
+    {
+      "name": "procedures-patient-dashboard",
+      "slot": "patient-chart-procedures-slot",
+      "component": "proceduresPatientDashboard"
+    },
+    {
       "name": "radiology-and-imaging-dashboard-root",
       "slot": "radiology-and-imaging-dashboard-slot",
       "component": "radiologyDashboardRoot"

@@ -45,6 +45,14 @@ export const radiologyImagingPatientDashboardMeta = {
   icon: 'omrs-icon-user-xray' as IconId,
 } as const;
 
+export const proceduresPatientDashboardMeta = {
+  path: 'procedures',
+  slot: 'patient-chart-procedures-slot',
+  // Same reason as above: pass the display text directly.
+  title: 'Procédures',
+  icon: 'omrs-icon-syringe' as IconId,
+} as const;
+
 export const createPatientChartDashboardLink =
   (config: { path: string; title: string; icon?: IconId }) =>
   ({ basePath }: { basePath: string }) =>

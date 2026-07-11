@@ -33,7 +33,6 @@
   "notDone": "Not Done",
   "completed": "Completed",
   "proceduresOrdered": "Procedures Ordered",
-  "imagingOrders": "Imaging orders",
   "results": "Results",
   "awaitingProcedure": "Awaiting Procedure",
   "ongoingProcedures": "Ongoing Procedures",
@@ -102,12 +101,10 @@
   "addResultsButton": "Add {{noun}} results",
   "enterResults": "Enter {{noun}} results",
   "saveAndClose": "Save and close",
-  "results": "Results",
   "resultSaved": "Result saved",
   "reasonForDecline": "Reason for decline",
   "noReasonProvided": "No reason provided.",
   "addResultsHelp": "Saving will mark this request as Completed.",
-  "saving": "Saving…",
   "approveResults": "Approve results",
   "resultsApproved": "Results approved",
   "attachImages": "Attach images",
@@ -119,5 +116,6 @@
   "fileTooLarge": "File too large",
   "fileSizeLimit": "{{name}} exceeds the 10 MB limit",
   "reportOptional": "Report (optional if attaching images)",
-  "enterResultsPlaceholder": "Enter {{noun}} results / report"
+  "enterResultsPlaceholder": "Enter {{noun}} results / report",
+  "procedureResults": "Procedure Results"
 }

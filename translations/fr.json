@@ -19,7 +19,7 @@
   "orderNotPicked": "Non prise en charge",
   "radiologyImagingOrders": "Examens de radiologie et imagerie",
   "imagingResults": "Résultats d'imagerie",
-  "imagingOrders": "Ordres d'imagerie",
+  "imagingOrders": "Examens d'imagerie",
   "proceduresOrders": "Ordres de procédures",
   "medicalSupplyOrders": "Fournitures médicales",
   "addImagingOrder": "Ajouter",
@@ -53,7 +53,6 @@
   "notDone": "Non effectués",
   "completed": "Terminés",
   "proceduresOrdered": "Procédures prescrites",
-  "imagingOrders": "Examens d'imagerie",
   "results": "Résultats",
   "awaitingProcedure": "Procédure en attente",
   "ongoingProcedures": "Procédures en cours",
@@ -122,12 +121,10 @@
   "addResultsButton": "Ajouter les résultats {{noun}}",
   "enterResults": "Saisir les résultats {{noun}}",
   "saveAndClose": "Enregistrer et fermer",
-  "results": "Résultats",
   "resultSaved": "Résultat enregistré",
   "reasonForDecline": "Raison du rejet",
   "noReasonProvided": "Aucune raison fournie.",
   "addResultsHelp": "L'enregistrement marquera cette demande comme Terminée.",
-  "saving": "Enregistrement…",
   "approveResults": "Approuver les résultats",
   "resultsApproved": "Résultats approuvés",
   "attachImages": "Joindre des images",
@@ -139,5 +136,6 @@
   "fileTooLarge": "Fichier trop volumineux",
   "fileSizeLimit": "{{name}} dépasse la limite de 10 Mo",
   "reportOptional": "Rapport (optionnel si des images sont jointes)",
-  "enterResultsPlaceholder": "Saisir les résultats / rapport {{noun}}"
+  "enterResultsPlaceholder": "Saisir les résultats / rapport {{noun}}",
+  "procedureResults": "Résultats des procédures"
 }

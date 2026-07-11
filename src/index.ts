@@ -6,6 +6,7 @@ import {
   radiologyDashboardMeta,
   proceduresDashboardMeta,
   radiologyImagingPatientDashboardMeta,
+  proceduresPatientDashboardMeta,
 } from './dashboard-link';
 
 const moduleName = 'cerveaubleu-drc-esm-orders-app';
@@ -115,6 +116,17 @@ export const radiologyImagingPatientDashboardLink = getSyncLifecycle(
 );
 export const imagingPatientDashboard = getAsyncLifecycle(
   () => import('./patient-chart/imaging-patient-dashboard.component'),
+  options,
+);
+
+// Patient-chart dashboard: Procedures (left-nav link + content)
+// t('procedures', 'Procedures')
+export const proceduresPatientDashboardLink = getSyncLifecycle(
+  createPatientChartDashboardLink(proceduresPatientDashboardMeta),
+  options,
+);
+export const proceduresPatientDashboard = getAsyncLifecycle(
+  () => import('./patient-chart/procedures-patient-dashboard.component'),
   options,
 );
 
