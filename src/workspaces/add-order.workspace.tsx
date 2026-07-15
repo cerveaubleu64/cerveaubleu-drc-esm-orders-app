@@ -12,6 +12,7 @@ import {
   SelectItem,
   Stack,
   TextArea,
+  TextInput,
   Tile,
 } from '@carbon/react';
 import { ArrowLeft, ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
@@ -37,10 +38,13 @@ import {
   type PathDrcBasketItem,
 } from '../order-basket';
 
+// Imaging and Procedure order types are org.openmrs.TestOrder; Medical Supply
+// is a plain org.openmrs.Order. The posted `type` must match the REST subclass
+// handler for that java class (there is no procedure-specific handler).
 const REST_TYPE_BY_KIND: Record<NonNullable<AddOrderWorkspaceProps['kind']>, OrderRestType> = {
-  imaging: 'procedureorder',
-  procedure: 'procedureorder',
-  medicalSupply: 'medicalsupplyorder',
+  imaging: 'testorder',
+  procedure: 'testorder',
+  medicalSupply: 'order',
 };
 
 export interface AddOrderWorkspaceProps {
@@ -56,10 +60,12 @@ interface OrderFields {
   orderReason?: string;
   instructions?: string;
   /** Procedure orders only. */
-  category?: string;
+  accessionNumber?: string;
+  procedureType?: string;
   bodySite?: string;
   frequency?: string;
   numberOfRepeats?: string;
+  commentToFulfiller?: string;
 }
 
 function patientUuidFromUrl(): string | undefined {
@@ -107,14 +113,16 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
   const [laterality, setLaterality] = useState<'' | 'LEFT' | 'RIGHT' | 'BILATERAL'>('');
   const [orderReason, setOrderReason] = useState('');
   const [instructions, setInstructions] = useState('');
-  const [category, setCategory] = useState('');
+  const [accessionNumber, setAccessionNumber] = useState('');
+  const [procedureType, setProcedureType] = useState('');
   const [bodySite, setBodySite] = useState('');
   const [frequency, setFrequency] = useState('');
   const [numberOfRepeats, setNumberOfRepeats] = useState('');
+  const [commentToFulfiller, setCommentToFulfiller] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   // Procedure-only option lists (hooks are no-ops when the UUIDs are undefined).
-  const { concepts: categoryOptions } = useOrderableConcepts(procedurePreset?.operationCategoryConceptSetUuid, '');
+  const { concepts: procedureTypeOptions } = useOrderableConcepts(procedurePreset?.procedureTypeConceptSetUuid, '');
   const { concepts: bodySiteOptions } = useOrderableConcepts(procedurePreset?.bodySiteConceptSetUuid, '');
   const { frequencies } = useOrderFrequencies();
   const { services: billableServices, isLoading: billablesLoading } = useBillableServices();
@@ -126,10 +134,12 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
     setLaterality('');
     setOrderReason('');
     setInstructions('');
-    setCategory('');
+    setAccessionNumber('');
+    setProcedureType('');
     setBodySite('');
     setFrequency('');
     setNumberOfRepeats('');
+    setCommentToFulfiller('');
   }, []);
 
   const closeForm = useCallback(() => {
@@ -170,9 +180,11 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
           ? fields.scheduledDate.toISOString()
           : undefined,
       laterality: isImaging && fields?.laterality ? fields.laterality : undefined,
-      orderReasonNonCoded: isServiceOrder ? fields?.orderReason?.trim() || undefined : undefined,
-      category: isProcedure && fields?.category ? fields.category : undefined,
-      bodySite: isProcedure && fields?.bodySite ? fields.bodySite : undefined,
+      orderReasonNonCoded: isServiceOrder && !isProcedure ? fields?.orderReason?.trim() || undefined : undefined,
+      accessionNumber: isProcedure && fields?.accessionNumber?.trim() ? fields.accessionNumber.trim() : undefined,
+      orderReason: isProcedure && fields?.procedureType ? fields.procedureType : undefined,
+      specimenSource: isProcedure && fields?.bodySite ? fields.bodySite : undefined,
+      commentToFulfiller: isProcedure && fields?.commentToFulfiller?.trim() ? fields.commentToFulfiller.trim() : undefined,
       frequency: isProcedure && fields?.frequency ? fields.frequency : undefined,
       numberOfRepeats:
         isProcedure && fields?.numberOfRepeats?.trim() ? Number(fields.numberOfRepeats) : undefined,
@@ -235,10 +247,12 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
       laterality,
       orderReason,
       instructions,
-      category,
+      accessionNumber,
+      procedureType,
       bodySite,
       frequency,
       numberOfRepeats,
+      commentToFulfiller,
     });
     setSubmitting(false);
     closeWorkspace?.({ closeWindow: false, discardUnsavedChanges: true });
@@ -275,35 +289,63 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
             </div>
 
             {isProcedure && (
+              <TextInput
+                id="referenceNumber"
+                labelText={t('referenceNumber', 'Reference number')}
+                value={accessionNumber}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAccessionNumber(e.target.value)}
+                disabled={submitting}
+              />
+            )}
+
+            {isProcedure && (
               <Select
                 id="operationCategory"
                 labelText={t('operationCategory', 'Operation category')}
-                value={category}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCategory(e.target.value)}
+                value={procedureType}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setProcedureType(e.target.value)}
                 disabled={submitting}>
                 <SelectItem value="" text={t('chooseAnOption', 'Choose an option')} />
-                {categoryOptions.map((c: OrderableConcept) => (
+                {procedureTypeOptions.map((c: OrderableConcept) => (
                   <SelectItem key={c.uuid} value={c.uuid} text={c.display} />
                 ))}
               </Select>
             )}
 
-            <Select
-              id="priority"
-              labelText={t('priority', 'Priority')}
-              value={urgency}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                const value = e.target.value as OrderFields['urgency'];
-                setUrgency(value);
-                if (value !== 'ON_SCHEDULED_DATE') setScheduledDate(null);
-              }}
-              disabled={submitting}>
-              <SelectItem value="ROUTINE" text={t('routine', 'Routine')} />
-              <SelectItem value="STAT" text={t('stat', 'Stat')} />
-              <SelectItem value="ON_SCHEDULED_DATE" text={t('scheduled', 'Scheduled')} />
-            </Select>
+            {isProcedure && (
+              // "Elective" vs "Emergency" maps onto the order's urgency so no
+              // extra backend field is needed.
+              <Select
+                id="procedurePriority"
+                labelText={t('priority', 'Priority')}
+                value={urgency}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setUrgency(e.target.value as OrderFields['urgency'])
+                }
+                disabled={submitting}>
+                <SelectItem value="STAT" text={t('emergency', 'Emergency')} />
+                <SelectItem value="ROUTINE" text={t('elective', 'Elective')} />
+              </Select>
+            )}
 
-            {urgency === 'ON_SCHEDULED_DATE' && (
+            {!isProcedure && (
+              <Select
+                id="priority"
+                labelText={t('priority', 'Priority')}
+                value={urgency}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  const value = e.target.value as OrderFields['urgency'];
+                  setUrgency(value);
+                  if (value !== 'ON_SCHEDULED_DATE') setScheduledDate(null);
+                }}
+                disabled={submitting}>
+                <SelectItem value="ROUTINE" text={t('routine', 'Routine')} />
+                <SelectItem value="STAT" text={t('stat', 'Stat')} />
+                <SelectItem value="ON_SCHEDULED_DATE" text={t('scheduled', 'Scheduled')} />
+              </Select>
+            )}
+
+            {!isProcedure && urgency === 'ON_SCHEDULED_DATE' && (
               <OpenmrsDatePicker
                 id="scheduledDate"
                 labelText={t('scheduledDate', 'Scheduled date')}
@@ -346,20 +388,6 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
             )}
 
             {isProcedure && (
-              <Select
-                id="frequency"
-                labelText={t('frequency', 'Frequency')}
-                value={frequency}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFrequency(e.target.value)}
-                disabled={submitting}>
-                <SelectItem value="" text={t('chooseAnOption', 'Choose an option')} />
-                {frequencies.map((f) => (
-                  <SelectItem key={f.uuid} value={f.uuid} text={f.display} />
-                ))}
-              </Select>
-            )}
-
-            {isProcedure && (
               <NumberInput
                 id="numberOfRepeats"
                 label={t('numberOfRepeats', 'Number of repeats')}
@@ -374,7 +402,21 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
               />
             )}
 
-            {isServiceOrder && (
+            {isProcedure && (
+              <Select
+                id="frequency"
+                labelText={t('frequency', 'Frequency')}
+                value={frequency}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFrequency(e.target.value)}
+                disabled={submitting}>
+                <SelectItem value="" text={t('chooseAnOption', 'Choose an option')} />
+                {frequencies.map((f) => (
+                  <SelectItem key={f.uuid} value={f.uuid} text={f.display} />
+                ))}
+              </Select>
+            )}
+
+            {isServiceOrder && !isProcedure && (
               <TextArea
                 id="orderReason"
                 labelText={t('orderReason', 'Order reason')}
@@ -399,6 +441,20 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
               disabled={submitting}
               rows={3}
             />
+
+            {isProcedure && (
+              <TextArea
+                id="commentToFulfiller"
+                labelText={t('commentsToFulfiller', 'Comments to fulfiller')}
+                placeholder={t('optionalCommentsToFulfiller', 'Optional comments for the person performing the procedure')}
+                value={commentToFulfiller}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCommentToFulfiller(e.target.value)}
+                enableCounter
+                maxCount={500}
+                disabled={submitting}
+                rows={3}
+              />
+            )}
 
             <p style={{ fontSize: '0.875rem', color: '#525252' }}>
               {t('addToBasketHelp', 'This order is added to the order basket. Click "Sign and close" to submit all orders.')}
@@ -503,8 +559,10 @@ const AddOrderWorkspace: React.FC<Workspace2DefinitionProps<AddOrderWorkspacePro
                         setLaterality(existing?.laterality ?? '');
                         setOrderReason(existing?.orderReasonNonCoded ?? '');
                         setInstructions(existing?.instructions ?? '');
-                        setCategory(existing?.category ?? '');
-                        setBodySite(existing?.bodySite ?? '');
+                        setAccessionNumber(existing?.accessionNumber ?? '');
+                        setProcedureType(existing?.orderReason ?? '');
+                        setBodySite(existing?.specimenSource ?? '');
+                        setCommentToFulfiller(existing?.commentToFulfiller ?? '');
                         setFrequency(existing?.frequency ?? '');
                         setNumberOfRepeats(existing?.numberOfRepeats != null ? String(existing.numberOfRepeats) : '');
                         setFormConcept(concept);

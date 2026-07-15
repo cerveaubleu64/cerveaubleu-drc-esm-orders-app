@@ -19,7 +19,10 @@ import { enqueueOrderBilling } from './api/billing.resource';
  * native lab and drug orders.
  */
 
-export type OrderRestType = 'order' | 'procedureorder' | 'medicalsupplyorder';
+// The REST module only registers subclass handlers for the core Order
+// subclasses; our order types map to org.openmrs.TestOrder (imaging,
+// procedure) and org.openmrs.Order (medical supply).
+export type OrderRestType = 'order' | 'testorder';
 
 export interface PathDrcBasketItem {
   // Fields the order basket UI / chart expect on every item.
@@ -34,10 +37,14 @@ export interface PathDrcBasketItem {
   laterality?: 'LEFT' | 'RIGHT' | 'BILATERAL';
   /** Free-text order reason. */
   orderReasonNonCoded?: string;
-  /** Procedure orders: operation category concept UUID. */
-  category?: string;
-  /** Procedure orders: body site concept UUID. */
-  bodySite?: string;
+  /** Procedure orders: reference number, stored as Order.accessionNumber. */
+  accessionNumber?: string;
+  /** Procedure orders: procedure type concept UUID, stored as Order.orderReason (coded). */
+  orderReason?: string;
+  /** Procedure orders: body site concept UUID, stored as TestOrder.specimenSource. */
+  specimenSource?: string;
+  /** Procedure orders: free-text comments for the fulfiller. */
+  commentToFulfiller?: string;
   /** Procedure orders: OrderFrequency UUID. */
   frequency?: string;
   /** Procedure orders: number of repeats. */
@@ -64,8 +71,10 @@ interface OrderPost {
   scheduledDate?: string;
   laterality?: string;
   orderReasonNonCoded?: string;
-  category?: string;
-  bodySite?: string;
+  accessionNumber?: string;
+  orderReason?: string;
+  specimenSource?: string;
+  commentToFulfiller?: string;
   frequency?: string;
   numberOfRepeats?: number;
 }
@@ -117,8 +126,10 @@ function postDataPrep(
     ...(order.urgency === 'ON_SCHEDULED_DATE' && order.scheduledDate ? { scheduledDate: order.scheduledDate } : {}),
     ...(order.laterality ? { laterality: order.laterality } : {}),
     ...(order.orderReasonNonCoded ? { orderReasonNonCoded: order.orderReasonNonCoded } : {}),
-    ...(order.category ? { category: order.category } : {}),
-    ...(order.bodySite ? { bodySite: order.bodySite } : {}),
+    ...(order.accessionNumber ? { accessionNumber: order.accessionNumber } : {}),
+    ...(order.orderReason ? { orderReason: order.orderReason } : {}),
+    ...(order.specimenSource ? { specimenSource: order.specimenSource } : {}),
+    ...(order.commentToFulfiller ? { commentToFulfiller: order.commentToFulfiller } : {}),
     ...(order.frequency ? { frequency: order.frequency } : {}),
     ...(order.numberOfRepeats != null ? { numberOfRepeats: order.numberOfRepeats } : {}),
   };

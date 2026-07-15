@@ -24,15 +24,15 @@ export const configSchema = {
       _description: 'Concept set whose members are the orderable procedures',
       _default: '1a8ce1bd-f6ac-46ef-90a0-fe59bd57cfb5',
     },
-    operationCategoryConceptSetUuid: {
+    procedureTypeConceptSetUuid: {
       _type: Type.UUID,
-      _description: 'Concept set whose members are the operation categories (e.g. Minor, Major)',
-      _default: '3840163f-4b04-4ff0-b703-7e9e76769235',
+      _description: 'Concept set whose members are the procedure types (e.g. Mineure, Majeure)',
+      _default: '9e5cf474-84c3-49c4-9e60-aece3db44fe2',
     },
     bodySiteConceptSetUuid: {
       _type: Type.UUID,
       _description: 'Concept set whose members are the selectable body sites',
-      _default: 'f6f071d2-e7f9-423c-b042-09a319866890',
+      _default: '3edb08bb-de40-498c-9c0d-94f98a1ff9f2',
     },
   },
   medicalSupply: {
@@ -54,7 +54,7 @@ export type Config = {
   procedure: {
     orderTypeUuid: string;
     conceptSetUuid: string;
-    operationCategoryConceptSetUuid: string;
+    procedureTypeConceptSetUuid: string;
     bodySiteConceptSetUuid: string;
   };
   medicalSupply: { orderTypeUuid: string; conceptSetUuid: string };

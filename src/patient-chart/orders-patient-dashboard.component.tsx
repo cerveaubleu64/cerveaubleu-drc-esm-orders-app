@@ -181,10 +181,18 @@ const OrdersTab: React.FC<{
   kind: OrderDashboardKind;
 }> = ({ orders, isLoading, onRefresh, patientUuid, kind }) => {
   const { t } = useTranslation();
+  const isProcedure = kind === 'procedure';
   const headers = [
     { key: 'orderNumber', header: t('orderNo', 'Order No') },
+    ...(isProcedure ? [{ key: 'referenceNumber', header: t('referenceNumber', 'Reference number') }] : []),
     { key: 'dateOrdered', header: t('dateOrdered', 'Date Ordered') },
     { key: 'order', header: t('order', 'Order') },
+    ...(isProcedure
+      ? [
+          { key: 'procedureType', header: t('operationCategory', 'Operation category') },
+          { key: 'bodySite', header: t('bodySite', 'Body site') },
+        ]
+      : []),
     { key: 'priority', header: t('priority', 'Priority') },
     { key: 'orderBy', header: t('orderBy', 'Order By') },
     { key: 'status', header: t('status', 'status') },
@@ -192,9 +200,24 @@ const OrdersTab: React.FC<{
   const rows = orders.map((o) => ({
     id: o.uuid,
     orderNumber: o.orderNumber,
+    ...(isProcedure
+      ? {
+          referenceNumber: o.accessionNumber || '—',
+          procedureType: o.orderReason?.display ?? '—',
+          bodySite: o.specimenSource?.display ?? '—',
+        }
+      : {}),
     dateOrdered: o.dateActivated ? formatDate(parseDate(o.dateActivated), { mode: 'standard', time: true }) : '—',
     order: o.concept?.display ?? o.display ?? '—',
-    priority: priorityTag(o.urgency),
+    priority: isProcedure ? (
+      o.urgency === 'STAT' ? (
+        <Tag type="red">{t('emergency', 'Emergency')}</Tag>
+      ) : (
+        <Tag type="green">{t('elective', 'Elective')}</Tag>
+      )
+    ) : (
+      priorityTag(o.urgency)
+    ),
     orderBy: o.orderer?.display ?? '—',
     status: statusTag(o, t),
   }));
@@ -313,7 +336,54 @@ const ResultsTab: React.FC<{
                         {row.isExpanded && order && (
                           <TableExpandedRow colSpan={hdrs.length + 1}>
                             <div style={{ padding: '0.5rem 0' }}>
-                              <div style={{ fontWeight: 700, background: '#e0e0e0', padding: '0.5rem 0.75rem' }}>
+                              {kind === 'procedure' && meta && (
+                                <>
+                                  <div style={{ fontWeight: 700, background: '#e0e0e0', padding: '0.5rem 0.75rem' }}>
+                                    {t('procedureDetails', 'Procedure details')}
+                                  </div>
+                                  <div style={{ padding: '0.75rem', border: '1px solid #f4f4f4' }}>
+                                    <table style={{ fontSize: '0.875rem', borderSpacing: '0 0.25rem' }}>
+                                      <tbody>
+                                        {[
+                                          [
+                                            t('startDatetime', 'Start date & time'),
+                                            meta.startDatetime
+                                              ? formatDate(new Date(meta.startDatetime), { mode: 'standard', time: true })
+                                              : '—',
+                                          ],
+                                          [
+                                            t('endDatetime', 'End date & time'),
+                                            meta.endDatetime
+                                              ? formatDate(new Date(meta.endDatetime), { mode: 'standard', time: true })
+                                              : '—',
+                                          ],
+                                          [t('procedureOutcome', 'Procedure outcome'), meta.outcome ?? '—'],
+                                          [
+                                            t('participants', 'Participant(s)'),
+                                            meta.participants.length ? meta.participants.join(', ') : '—',
+                                          ],
+                                          [
+                                            t('complications', 'Complications'),
+                                            meta.complications?.trim() || '—',
+                                          ],
+                                        ].map(([label, value]) => (
+                                          <tr key={label as string}>
+                                            <td style={{ fontWeight: 600, paddingRight: '1.5rem' }}>{label}</td>
+                                            <td>{value}</td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </>
+                              )}
+                              <div
+                                style={{
+                                  fontWeight: 700,
+                                  background: '#e0e0e0',
+                                  padding: '0.5rem 0.75rem',
+                                  marginTop: kind === 'procedure' ? '0.5rem' : 0,
+                                }}>
                                 {t('findings', 'Findings')}
                               </div>
                               <div style={{ padding: '0.75rem', border: '1px solid #f4f4f4', whiteSpace: 'pre-wrap' }}>

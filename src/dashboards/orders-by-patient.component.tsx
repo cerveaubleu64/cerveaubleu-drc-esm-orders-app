@@ -232,7 +232,9 @@ const OrdersByPatient: React.FC<OrdersByPatientProps> = ({
       conceptDisplay: o.concept?.display ?? o.display ?? '—',
       allowFileUpload: isImaging,
       requiresReview: isImaging,
+      procedureFields: kind === 'procedure',
       initialResult: parseResultComment(o.fulfillerComment).report,
+      initialComment: o.fulfillerComment ?? '',
       onSuccess: onChanged,
     });
   }
@@ -354,12 +356,43 @@ const OrdersByPatient: React.FC<OrdersByPatientProps> = ({
                                   padding: '1rem 1.5rem',
                                   borderTop: '1px solid #e0e0e0',
                                 }}>
-                                <DetailRow label={t('urgency', 'Urgency')}>
-                                  <Tag type={u.type}>{u.label}</Tag>
+                                <DetailRow
+                                  label={
+                                    kind === 'procedure' ? t('priority', 'Priority') : t('urgency', 'Urgency')
+                                  }>
+                                  <Tag type={u.type}>
+                                    {kind === 'procedure'
+                                      ? u.type === 'red'
+                                        ? t('emergency', 'Emergency')
+                                        : t('elective', 'Elective')
+                                      : u.label}
+                                  </Tag>
                                 </DetailRow>
                                 <DetailRow label={t('xOrdered', '{{noun}} ordered', { noun: capitalize(kindNoun) })}>
                                   {o.concept?.display ?? '—'}
                                 </DetailRow>
+                                {kind === 'procedure' && (
+                                  <>
+                                    <DetailRow label={t('referenceNumber', 'Reference number')}>
+                                      {o.accessionNumber || '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('operationCategory', 'Operation category')}>
+                                      {o.orderReason?.display ?? '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('bodySite', 'Body site')}>
+                                      {o.specimenSource?.display ?? '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('numberOfRepeats', 'Number of repeats')}>
+                                      {o.numberOfRepeats != null ? String(o.numberOfRepeats) : '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('frequency', 'Frequency')}>
+                                      {o.frequency?.display ?? '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('commentsToFulfiller', 'Comments to fulfiller')}>
+                                      {o.commentToFulfiller?.trim() || '—'}
+                                    </DetailRow>
+                                  </>
+                                )}
                                 <DetailRow label={t('status', 'Status')}>
                                   <Tag type={st.type}>{st.label}</Tag>
                                 </DetailRow>
@@ -385,6 +418,29 @@ const OrdersByPatient: React.FC<OrdersByPatientProps> = ({
                                   <DetailRow label={t('reasonForDecline', 'Reason for decline')}>
                                     {o.fulfillerComment?.trim() || t('noReasonProvided', 'No reason provided.')}
                                   </DetailRow>
+                                )}
+                                {kind === 'procedure' && resultsEntered && (
+                                  <>
+                                    <DetailRow label={t('startDatetime', 'Start date & time')}>
+                                      {meta.startDatetime
+                                        ? formatDate(new Date(meta.startDatetime), { mode: 'standard', time: true })
+                                        : '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('endDatetime', 'End date & time')}>
+                                      {meta.endDatetime
+                                        ? formatDate(new Date(meta.endDatetime), { mode: 'standard', time: true })
+                                        : '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('procedureOutcome', 'Procedure outcome')}>
+                                      {meta.outcome ?? '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('participants', 'Participant(s)')}>
+                                      {meta.participants.length ? meta.participants.join(', ') : '—'}
+                                    </DetailRow>
+                                    <DetailRow label={t('complications', 'Complications')}>
+                                      {meta.complications?.trim() || '—'}
+                                    </DetailRow>
+                                  </>
                                 )}
                                 {resultsEntered && meta.report ? (
                                   <DetailRow label={t('results', 'Results')}>{meta.report}</DetailRow>

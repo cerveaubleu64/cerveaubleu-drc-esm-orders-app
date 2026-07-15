@@ -57,7 +57,8 @@ const OrdersDashboard: React.FC<OrdersDashboardProps> = ({
   const config = useConfig<Config>();
   const orderTypeUuid = config[kind]?.orderTypeUuid;
   const conceptSetUuid = config[kind]?.conceptSetUuid;
-  const { orders, isLoading, error, mutate } = useOrdersByType(orderTypeUuid);
+  // Both dashboard kinds (imaging, procedure) are TestOrder types.
+  const { orders, isLoading, error, mutate } = useOrdersByType(orderTypeUuid, true);
   const { memberUuids } = useConceptSetMembers(conceptSetUuid);
   const memberSet = useMemo(() => new Set(memberUuids), [memberUuids]);
 
